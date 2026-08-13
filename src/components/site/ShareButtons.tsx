@@ -34,14 +34,14 @@ export default function ShareButtons({ url, title }: { url: string; title: strin
           href={l.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-full border px-3 py-1 text-sm transition hover:bg-muted"
+          className="inline-flex min-h-[44px] items-center rounded-full border px-4 py-2 text-sm transition hover:bg-muted"
         >
           {l.label}
         </a>
       ))}
       <button
         onClick={copy}
-        className="rounded-full border px-3 py-1 text-sm transition hover:bg-muted"
+        className="inline-flex min-h-[44px] items-center rounded-full border px-4 py-2 text-sm transition hover:bg-muted"
       >
         {copied ? "Copied!" : "Copy link"}
       </button>

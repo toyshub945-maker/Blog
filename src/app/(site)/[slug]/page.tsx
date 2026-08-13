@@ -209,7 +209,7 @@ export default async function ArticlePage({
               <Link
                 key={t.id}
                 href={`/tag/${t.slug}`}
-                className="rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground transition hover:text-foreground"
+                className="inline-flex min-h-[40px] items-center rounded-full bg-muted px-4 py-2 text-sm text-muted-foreground transition hover:text-foreground"
               >
                 #{t.name}
               </Link>
