@@ -1,0 +1,100 @@
+// Prisma schema for the Blog / News publishing platform.
+//
+// Local dev uses SQLite (zero setup). For production on Vercel/NAS, switch the
+// datasource provider to "postgresql" and point DATABASE_URL at Neon/Postgres.
+// The schema is written to be portable: no scalar-list columns, JSON stored as
+// strings, all relations explicit.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Admin / author accounts. Named authors power author pages + E-E-A-T signals.
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String // bcrypt hash
+  role      String   @default("author") // "admin" | "author"
+  bio       String?
+  avatar    String?
+  twitter   String?
+  linkedin  String?
+  website   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post[]
+}
+
+/// A single article.
+model Post {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  excerpt     String? // dek / summary shown on cards + used as meta description fallback
+  bodyJson    String? // Tiptap document JSON (stringified) — source of truth for editing
+  bodyHtml    String? // rendered HTML — served to readers + AI crawlers (server-rendered)
+  answerBlock String? // direct-answer block (40-60 words) near the top — GEO quotability
+  coverImage  String?
+  coverAlt    String?
+  coverWidth  Int?
+  coverHeight Int?
+  status      String    @default("draft") // draft | scheduled | published
+  featured    Boolean   @default(false)
+  publishedAt DateTime?
+  readingTime Int? // minutes
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // SEO fields
+  metaTitle       String?
+  metaDescription String?
+  canonicalUrl    String?
+  focusKeyword    String?
+
+  // FAQ blocks stored as JSON string: [{ "q": "...", "a": "..." }]
+  faq String?
+
+  author     User      @relation(fields: [authorId], references: [id])
+  authorId   String
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?
+  tags       Tag[]     @relation("PostTags")
+
+  @@index([status, publishedAt])
+  @@index([authorId])
+  @@index([categoryId])
+}
+
+/// Topic hub. Each category gets its own indexable listing page.
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  posts       Post[]
+}
+
+/// Lightweight tag. Each tag gets its own indexable listing page.
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
+  posts Post[] @relation("PostTags")
+}
+
+/// Uploaded images (reusable media library).
+model Media {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String?
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now())
+}

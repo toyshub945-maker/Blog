@@ -1,0 +1,70 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* ------------------------------------------------------------------ */
+/*  Design tokens — editorial theme, light + dark                      */
+/* ------------------------------------------------------------------ */
+:root {
+  --background: #ffffff;
+  --foreground: #16181d;
+  --muted: #f4f5f7;
+  --muted-foreground: #5b6572;
+  --border: #e5e7eb;
+  --card: #ffffff;
+  --accent: #c8102e; /* newsroom red — change to your brand */
+  --accent-foreground: #ffffff;
+  --ring: #c8102e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0d0f12;
+    --foreground: #e8eaed;
+    --muted: #171a1f;
+    --muted-foreground: #9aa4b1;
+    --border: #242830;
+    --card: #14171b;
+    --accent: #ff5a6a;
+    --accent-foreground: #16181d;
+    --ring: #ff5a6a;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-sans-var);
+  --font-serif: var(--font-serif-var);
+  --font-mono: var(--font-mono-var);
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans-var), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Article prose tuning on top of @tailwindcss/typography */
+.prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-links: var(--accent);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-quotes: var(--muted-foreground);
+  --tw-prose-quote-borders: var(--accent);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-hr: var(--border);
+  --tw-prose-bullets: var(--muted-foreground);
+}
