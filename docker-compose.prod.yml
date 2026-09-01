@@ -1,0 +1,52 @@
+# Production compose for the on-premises NAS (coolcept-nas).
+# Run with: docker compose -f docker-compose.prod.yml up -d --build
+#
+# Architecture (mirrors the ECBU/portal pattern already on this NAS):
+#  - Attaches to the shared `tiktok-analytics_default` network, declared
+#    external. A cloudflared container lives on that network and resolves
+#    `blog-web` by Docker DNS to forward public traffic. Add the public
+#    hostname in the Cloudflare dashboard pointing at http://blog-web:3000
+#  - No host port bindings: nothing on the LAN can bypass Cloudflare.
+#  - SQLite persists in the named volume `blog-data` (mounted at /data);
+#    uploaded images persist in `blog-uploads`. Both survive rebuilds.
+#
+# Values come from the .env file sitting next to this file (see .env.example).
+
+services:
+  blog:
+    build:
+      context: .
+      args:
+        # NEXT_PUBLIC_* are inlined at build time — a change here requires a
+        # rebuild (--build), not just a restart.
+        NEXT_PUBLIC_SITE_URL: ${SITE_URL}
+        NEXT_PUBLIC_SITE_NAME: ${SITE_NAME}
+        NEXT_PUBLIC_ADSENSE_CLIENT: ${ADSENSE_CLIENT:-}
+    container_name: blog-web
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # Bind all interfaces. Next.js standalone otherwise binds a single NIC,
+      # and cloudflared (on the shared network) would get connection-refused.
+      HOSTNAME: 0.0.0.0
+      DATABASE_URL: "file:/data/blog.db"
+      AUTH_SECRET: ${AUTH_SECRET}
+      NEXT_PUBLIC_SITE_URL: ${SITE_URL}
+      NEXT_PUBLIC_SITE_NAME: ${SITE_NAME}
+      INITIAL_ADMIN_EMAIL: ${INITIAL_ADMIN_EMAIL}
+      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD}
+      INITIAL_ADMIN_NAME: ${INITIAL_ADMIN_NAME:-Editor}
+    volumes:
+      - blog-data:/data
+      - blog-uploads:/app/public/uploads
+    networks:
+      - tiktok-analytics_default
+
+volumes:
+  blog-data:
+  blog-uploads:
+
+networks:
+  tiktok-analytics_default:
+    external: true

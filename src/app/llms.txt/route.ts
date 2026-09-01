@@ -2,7 +2,8 @@ import { getLivePosts } from "@/lib/queries";
 import { getCategories } from "@/lib/queries";
 import { absoluteUrl, siteConfig } from "@/lib/site";
 
-export const revalidate = 600;
+// Built per request (see the note in sitemap.ts).
+export const dynamic = "force-dynamic";
 
 // llms.txt — a curated, machine-readable map of the site for AI answer engines
 // (ChatGPT, Perplexity, Claude, Gemini). Uses each article's direct-answer block

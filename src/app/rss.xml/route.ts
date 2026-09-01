@@ -1,7 +1,8 @@
 import { getLivePosts } from "@/lib/queries";
 import { absoluteUrl, siteConfig } from "@/lib/site";
 
-export const revalidate = 600;
+// Built per request (see the note in sitemap.ts).
+export const dynamic = "force-dynamic";
 
 function escapeXml(s: string) {
   return s

@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Required for the Docker image: emits a self-contained server in
+  // .next/standalone that the Dockerfile copies into a slim runtime layer.
+  output: "standalone",
   images: {
     // Serve modern formats for Core Web Vitals / Discover.
     formats: ["image/avif", "image/webp"],

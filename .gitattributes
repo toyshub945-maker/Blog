@@ -1,0 +1,7 @@
+# Force LF for files executed inside Linux containers. Without this, Git on
+# Windows checks them out with CRLF and the container fails with
+# "no such file or directory" / "bad interpreter".
+*.sh text eol=lf
+docker-entrypoint.sh text eol=lf
+Dockerfile text eol=lf
+*.mjs text eol=lf

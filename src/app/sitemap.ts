@@ -3,7 +3,9 @@ import { prisma } from "@/lib/db";
 import { liveWhere } from "@/lib/queries";
 import { absoluteUrl } from "@/lib/site";
 
-export const revalidate = 3600;
+// Generated per request from the database. Must not be baked at build time —
+// the build runs against an empty database, which would ship an empty sitemap.
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [posts, categories, tags, authors] = await Promise.all([

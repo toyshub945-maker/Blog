@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.github
+.claude
+.vercel
+npm-debug.log*
+.env
+.env.*
+!.env.example
+prisma/*.db
+prisma/*.db-journal
+public/uploads
+README.md
+*.md
+!AGENTS.md

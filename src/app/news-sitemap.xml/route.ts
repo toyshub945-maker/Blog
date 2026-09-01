@@ -2,7 +2,9 @@ import { prisma } from "@/lib/db";
 import { liveWhere } from "@/lib/queries";
 import { absoluteUrl, siteConfig } from "@/lib/site";
 
-export const revalidate = 300;
+// Built per request — this feed is a rolling 48-hour window, so it must never
+// be served from a build-time snapshot.
+export const dynamic = "force-dynamic";
 
 function escapeXml(s: string) {
   return s
