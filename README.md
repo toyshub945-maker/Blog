@@ -89,11 +89,43 @@ Brand color, default description, and social handle live in
    Blob** or **Cloudflare R2/S3** (only the returned `url` matters to the rest of
    the app). Add the host to `remotePatterns` in `next.config.ts`.
 
-### Option B — Your NAS + Cloudflare Tunnel
+### Option B — The NAS + Cloudflare Tunnel  ← currently deployed
 
-Same pattern as ECBU/BDBU: Dockerize (`next build` with `output: "standalone"`),
-run behind Cloudflare Tunnel, point a `*.coolcept.org` subdomain at it. Use a
-Postgres container for the DB and a volume (or R2) for uploads.
+Lives at `/srv/coolcept/blog` on `coolcept-nas` (`ssh root@100.107.58.107`).
+Container `blog-web` joins the shared `tiktok-analytics_default` network with
+**no host ports**; a `cloudflared` container on that network resolves it by
+name. SQLite lives in the `blog_blog-data` volume and uploads in
+`blog_blog-uploads`, so both survive rebuilds.
+
+**Deploy / redeploy:**
+
+```bash
+cd /srv/coolcept/blog && git pull && docker compose -f docker-compose.prod.yml up -d --build
+```
+
+**Connecting a domain** (needed once you register one):
+
+1. Edit `/srv/coolcept/blog/.env` → set `SITE_URL=https://yourdomain.com`.
+2. Rebuild — `SITE_URL` is compiled into the pages, so a restart is not enough:
+   ```bash
+   cd /srv/coolcept/blog && docker compose -f docker-compose.prod.yml up -d --build
+   ```
+3. In the Cloudflare dashboard → Zero Trust → Networks → Tunnels, add a public
+   hostname on the tunnel for that domain pointing at `http://blog-web:3000`.
+
+**Backup before a redeploy** (mirrors the ECBU habit — code *and* data):
+
+```bash
+docker run --rm -v blog_blog-data:/d -v /srv/coolcept/backups:/b alpine tar czf /b/blog_data_$(date +%F).tar.gz -C /d .
+```
+
+**Notes**
+- The image bundles the full resolved `node_modules` so the Prisma CLI can run
+  `migrate deploy` at startup without network access. That makes the image
+  large (~GBs) but the container start deterministic.
+- Fonts are self-hosted; the NAS cannot reach `fonts.googleapis.com` at build.
+- The first admin is created from `INITIAL_ADMIN_*` in `.env` on first start.
+  Changing those later does **not** alter an existing account.
 
 ### Switching SQLite → Postgres
 
