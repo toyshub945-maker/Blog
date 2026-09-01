@@ -48,18 +48,20 @@ ENV NODE_ENV=production \
     PORT=3000 \
     HOSTNAME=0.0.0.0
 
+# Full dependency tree first. The Prisma CLI (used for `migrate deploy` on
+# startup) pulls in a deep transitive tree, so cherry-picking packages is
+# fragile — copying the resolved tree keeps the runtime deterministic and needs
+# no network. The standalone output is layered on top afterwards and wins for
+# any overlapping file.
+COPY --from=builder /app/node_modules ./node_modules
+
 # Next.js standalone output.
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# Prisma runtime: schema + migrations + generated client + CLI (for
-# `migrate deploy` on startup).
+# Prisma schema + migration history (read by `migrate deploy`).
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/bcryptjs ./node_modules/bcryptjs
 
 COPY scripts/bootstrap-admin.mjs ./scripts/bootstrap-admin.mjs
 COPY docker-entrypoint.sh ./docker-entrypoint.sh
