@@ -40,9 +40,10 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-ring: var(--ring);
-  --font-sans: var(--font-sans-var);
-  --font-serif: var(--font-serif-var);
-  --font-mono: var(--font-mono-var);
+  --font-sans: var(--font-sans-var), system-ui, sans-serif;
+  --font-serif: var(--font-serif-var), Georgia, serif;
+  /* Monospace uses the reader's own system font — no download needed. */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 * {

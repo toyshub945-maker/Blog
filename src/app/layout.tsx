@@ -1,14 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Newsreader } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { siteConfig } from "@/lib/site";
 
-const sans = Geist({ variable: "--font-sans-var", subsets: ["latin"] });
-const mono = Geist_Mono({ variable: "--font-mono-var", subsets: ["latin"] });
-const serif = Newsreader({
+// Fonts are self-hosted (Latin subset, variable weights) rather than fetched
+// from Google Fonts. That keeps Docker builds offline-capable and removes a
+// third-party request on every page load — better LCP and no layout shift.
+const sans = localFont({
+  src: "./fonts/inter-latin.woff2",
+  variable: "--font-sans-var",
+  weight: "300 700",
+  display: "swap",
+  fallback: ["system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
+});
+
+const serif = localFont({
+  src: "./fonts/newsreader-latin.woff2",
   variable: "--font-serif-var",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
+  weight: "400 700",
+  display: "swap",
+  fallback: ["Georgia", "Times New Roman", "serif"],
 });
 
 export const metadata: Metadata = {
@@ -51,7 +62,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${sans.variable} ${mono.variable} ${serif.variable} h-full antialiased`}
+      className={`${sans.variable} ${serif.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}
